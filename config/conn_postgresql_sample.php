@@ -4,6 +4,7 @@ define ("HOST","127.0.0.1");
 define ("DB_USER","postgres");
 define ("DB_NAME","spdmlk");
 define ("BASE_PATH","/home/arifsuwadji/braincode/project/spdmlk-be");
+define ("BASE_DOC","/home/arifsuwadji/braincode/project/docs");
 
 function Connect(){
     $connect = pg_connect("host=".HOST." port=5432 dbname=".DB_NAME." user=".DB_USER);
