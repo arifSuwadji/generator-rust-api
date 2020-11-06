@@ -2,9 +2,9 @@
     require_once 'functions.php';
     
     // echo "Commands: \n
-    //     php -r \"require 'AdjiGenerator.php'; crud('table','folder');\"
+    //     php -r \"require 'AdjiGenerator.php'; crud('table','folder1','folder2');\"
     // \n";
-    function crud_single($table="", $folder=""){
+    function crud_single_sub($table="", $folder1="", $folder2=""){
         //all field
         $allField = AllField($table);
 
@@ -26,7 +26,8 @@ struct ".ucfirst($table)." {
     $i = 1;
     foreach($allField as $fieldName){
         // print($fieldName['column_name'].' : '.$fieldName['data_type']);
-        $string .= $fieldName['column_name']." : "; $string .= $fieldName['data_type'] == 'integer' ? 'i32,' : 'String'.",
+        $string .= $fieldName['column_name']." : "; $string .= $fieldName['data_type'] == 'integer' ? 'i32'.",
+        " : 'String'.",
         ";
         $column_query .= $fieldName['column_name'].", ";
         $param_query .= $table.".".$fieldName['column_name'].", ";
@@ -42,7 +43,7 @@ struct ".ucfirst($table)." {
 struct PK { ".$primaryField['column_name'].": "; $string .= $primaryField['data_type'] == 'integer' ? 'i32 } // primary key' : 'String'." } // primary key
     ";
     $string .="
-// http://127.0.0.1:8182/$folder/$table
+// http://127.0.0.1:8182/$folder1/$folder2/$table
 pub async fn list(req: Request<PgPool>) -> tide::Result<Response> {
     let pool = req.state();
 
@@ -53,7 +54,7 @@ pub async fn list(req: Request<PgPool>) -> tide::Result<Response> {
     crate::to_json(&list_".$table.")
 }
 
-// http://127.0.0.1:8182/$folder/$table
+// http://127.0.0.1:8182/$folder1/$folder2/$table
 pub async fn tambah(mut req: Request<PgPool>) -> tide::Result<Response> {
     let ".$table.": ".ucfirst($table)." = req.body_json().await?;
     let pool = req.state();
@@ -66,7 +67,7 @@ pub async fn tambah(mut req: Request<PgPool>) -> tide::Result<Response> {
     crate::ws_response(\"OK\", \"Data telah tersimpan\")
 }
 
-// http://127.0.0.1:8182/$folder/$table
+// http://127.0.0.1:8182/$folder1/$folder2/$table
 pub async fn edit(mut req: Request<PgPool>) -> tide::Result<Response> {
     let ".$table.": ".ucfirst($table)." = req.body_json().await?;
     let pool = req.state();
@@ -79,7 +80,7 @@ pub async fn edit(mut req: Request<PgPool>) -> tide::Result<Response> {
     crate::ws_response(\"OK\", \"Data telah diupdate\")
 }
 
-// http://127.0.0.1:8182/$folder/$table?".$primaryField['column_name']."=
+// http://127.0.0.1:8182/$folder1/$folder2/$table?".$primaryField['column_name']."=
 pub async fn hapus(req: Request<PgPool>) -> tide::Result<Response> {
     let pool = req.state();
     let pk: PK = req.query()?;
@@ -91,10 +92,10 @@ pub async fn hapus(req: Request<PgPool>) -> tide::Result<Response> {
 }
         ";
         //controller
-        createFile($string, BASE_PATH."/src/handler/".$folder."/".$table.".rs");
+        createFile($string, BASE_PATH."/src/handler/$folder1/$folder2/".$table.".rs");
         
         //initilize controller
-        $mod = BASE_PATH."/src/handler/$folder/mod.rs";
+        $mod = BASE_PATH."/src/handler/$folder1/$folder2/mod.rs";
         $data = "pub mod $table;\n";
         if(!write_file($mod, $data, 'a')){
             echo 'Unable to write mod the file'."\r\n";
@@ -105,7 +106,7 @@ pub async fn hapus(req: Request<PgPool>) -> tide::Result<Response> {
         //path
         $path = BASE_PATH."/src/paths.rs";
         $dataPath = "
-    app.at(\"/$folder/$table\")
+    app.at(\"/$folder1/$folder2/$table\")
         .get( $table::list)
         .post($table::tambah)
         .patch($table::edit)
@@ -122,21 +123,21 @@ pub async fn hapus(req: Request<PgPool>) -> tide::Result<Response> {
                 <li>".ucfirst($table)."
                     <ol>
                         <li>List<pre>
-    GET /$folder/$table
+    GET /$folder1/$folder2/$table
     JSON Response Body : [{".substr($json_param, 0, -2)."}]
                         </pre></li>
                         <li>Tambah<pre>
-    POST /$folder/$table
+    POST /$folder1/$folder2/$table
     JSON Request Body: {".substr($json_param, 0, -2)."}
 
     Keterangan :
                         </pre></li>
                         <li>Edit<pre>
-    PATCH /$folder/$table
+    PATCH /$folder1/$folder2/$table
     JSON Request Body: {".substr($json_param, 0, -2)."}
                         </pre></li>
                         <li>Delete<pre>
-    DELETE /$folder/$table?".$primaryField['column_name']."=
+    DELETE /$folder1/$folder2/$table?".$primaryField['column_name']."=
                         </pre></li>
                     </ol>
                 </li>
