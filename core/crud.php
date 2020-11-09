@@ -26,7 +26,8 @@ struct ".ucfirst($table)." {
     $i = 1;
     foreach($allField as $fieldName){
         // print($fieldName['column_name'].' : '.$fieldName['data_type']);
-        $string .= $fieldName['column_name']." : "; $string .= $fieldName['data_type'] == 'integer' ? 'i32,' : 'String'.",
+        $string .= $fieldName['column_name']." : "; $string .= $fieldName['data_type'] == 'integer' ? 'i32'.",
+        " : 'String'.",
         ";
         $column_query .= $fieldName['column_name'].", ";
         $param_query .= $table.".".$fieldName['column_name'].", ";
