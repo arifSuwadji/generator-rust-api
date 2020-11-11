@@ -2,6 +2,7 @@
     require_once 'core/crud.php';
     require_once 'core/crud_sub.php';
     require_once 'core/crud_module.php';
+    require_once 'core/read_module.php';
     
     // echo "Commands: \n
     //     php -r \"require 'AdjiGenerator.php'; crud('table','folder');\"
@@ -22,5 +23,12 @@
     // \n";
     function crud_module($table=""){
         crud_single_module($table);
+    }
+
+    // echo "Commands: \n
+    //     php -r \"require 'AdjiGenerator.php'; read_module('controller','tables');\"
+    // \n";
+    function read_module($controller="", $tables=""){
+        read_tables($controller, $tables);
     }
 ?>

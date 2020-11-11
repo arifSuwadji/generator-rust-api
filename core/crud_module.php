@@ -2,7 +2,7 @@
     require_once 'functions.php';
     
     // echo "Commands: \n
-    //     php -r \"require 'AdjiGenerator.php'; crud('table','folder');\"
+    //     php -r \"require 'AdjiGenerator.php'; crud_module('table');\"
     // \n";
     function crud_single_module($table=""){
         //all field
