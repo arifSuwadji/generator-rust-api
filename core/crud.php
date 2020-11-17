@@ -1,10 +1,11 @@
 <?php
     require_once 'functions.php';
+    require_once 'find_string.php';
     
     // echo "Commands: \n
-    //     php -r \"require 'AdjiGenerator.php'; crud('table','folder');\"
+    //     php -r \"require 'AdjiGenerator.php'; crud('table','folder', 'foreigns');\"
     // \n";
-    function crud_single($table="", $folder=""){
+    function crud_single($table="", $folder="", $foreigns=""){
         //all field
         $allField = AllField($table);
 
@@ -12,8 +13,9 @@
         $primaryField = PrimaryField($table);
         var_dump($primaryField);
 
-        $string .="use tide::{Request, Response};
+        $string .="use tide::{Request, Response, Body};
 use sqlx::PgPool;
+use crate::{data, data::{fields, Type}};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 struct ".ucfirst($table)." {
@@ -37,6 +39,7 @@ struct ".ucfirst($table)." {
         $i++;
     }
     $string .="
+    #[serde(skip_deserializing)]
 }
 
 #[derive(serde::Deserialize)]
@@ -90,7 +93,47 @@ pub async fn hapus(req: Request<PgPool>) -> tide::Result<Response> {
 
     crate::ws_response(\"OK\", \"Data telah dihapus\")
 }
+";
+$string .="
+pub async fn form(req: Request<PgPool>) -> tide::Result<Body> {
+    let pool = req.state();
+    fields(vec![
         ";
+    $arrForeigns = explode(';', $foreigns);
+    foreach($allField as $fieldName){
+        // var_dump($arrForeigns);
+        $found_string = find_string($fieldName['column_name'], $arrForeigns);
+        // echo($found_string);
+        if($found_string){
+    $string .="(\"".$fieldName['column_name']."\", Type::Select, data::".$fieldName['column_name']."(pool).await?),
+    ";
+        }else{
+            if($fieldName['data_type'] == 'USER-DEFINED'){
+    $string .="(\"".$fieldName['column_name']."\", Type::Select, data::".$fieldName['column_name']."()),
+    ";
+            }else{
+                if($fieldName['column_name'] == 'id'){
+    $string .="(\"".$fieldName['column_name']."\", Type::Number, data::auto_inc()),
+    ";
+                }else{
+                    if($fieldName['data_type'] == 'integer'){
+    $string .="(\"".$fieldName['column_name']."\", Type::Number, vec![]),
+    ";
+                    }else if($fieldName['data_type'] == 'smallint'){
+    $string .="(\"".$fieldName['column_name']."\", Type::Number, vec![]),
+    ";
+                    }else{
+    $string .="(\"".$fieldName['column_name']."\", Type::Text, vec![]),
+    ";
+                    }
+                }
+            }
+        }
+    }
+    $string .="
+    ])
+}
+";
         //controller
         createFile($string, BASE_PATH."/src/handler/".$folder."/".$table.".rs");
         
@@ -107,6 +150,7 @@ pub async fn hapus(req: Request<PgPool>) -> tide::Result<Response> {
         $path = BASE_PATH."/src/paths.rs";
         $dataPath = "
     app.at(\"/$folder/$table\")
+        .put( $table::form)
         .get( $table::list)
         .post($table::tambah)
         .patch($table::edit)
@@ -138,6 +182,10 @@ pub async fn hapus(req: Request<PgPool>) -> tide::Result<Response> {
                         </pre></li>
                         <li>Delete<pre>
     DELETE /$folder/$table?".$primaryField['column_name']."=
+                        </pre></li>
+                        <li>Form<pre>
+    PATCH /$folder/$table
+    JSON Request Body: {".substr($json_param, 0, -2)."}
                         </pre></li>
                     </ol>
                 </li>

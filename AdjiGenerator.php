@@ -5,12 +5,14 @@
     require_once 'core/read_module.php';
     require_once 'core/foreign_form.php';
     require_once 'core/form_need.php';
+    require_once 'core/form_need_sub.php';
+    require_once 'core/form_module.php';
     
     // echo "Commands: \n
-    //     php -r \"require 'AdjiGenerator.php'; crud('table','folder');\"
+    //     php -r \"require 'AdjiGenerator.php'; crud('table','folder','foreigns');\"
     // \n";
-    function crud($table="", $folder=""){
-        crud_single($table, $folder);        
+    function crud($table="", $folder="", $foreigns=""){
+        crud_single($table, $folder, $foreigns);
     }
 
     // echo "Commands: \n
@@ -46,5 +48,19 @@
     // \n";
     function form($table="", $folder="", $foreigns=""){
         form_need($table, $folder, $foreigns);
+    }
+
+    // echo "Commands: \n
+    //     php -r \"require 'AdjiGenerator.php'; form('table', 'folder1', 'folder2', 'foreigns');\"
+    // \n";
+    function form_sub($table="", $folder="", $folder2="", $foreigns=""){
+        form_need_sub($table, $folder, $folder2, $foreigns);
+    }
+
+    // echo "Commands: \n
+    //     php -r \"require 'AdjiGenerator.php'; form_module('table', 'foreigns');\"
+    // \n";
+    function form_module($table="", $foreigns=""){
+        form_need_module($table, $foreigns);
     }
 ?>

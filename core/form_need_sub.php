@@ -3,9 +3,9 @@
     require_once 'find_string.php';
     
     // echo "Commands: \n
-    //     php -r \"require 'AdjiGenerator.php'; form('table', 'folder', 'foreigns');\"
+    //     php -r \"require 'AdjiGenerator.php'; form_sub('table', 'folder1', 'folder2', 'foreigns');\"
     // \n";
-    function form_need($table="", $folder="", $foreigns=""){
+    function form_need_sub($table="", $folder="", $folder2="", $foreigns=""){
         //all field
         $allField = AllField($table);
 
@@ -56,7 +56,7 @@ pub async fn form(req: Request<PgPool>) -> tide::Result<Body> {
 }
 ";
         //controller
-        $pathController = BASE_PATH."/src/handler/$folder/".$table.".rs";
+        $pathController = BASE_PATH."/src/handler/$folder/$folder2/".$table.".rs";
         if(!write_file($pathController, $string, 'a')){
             echo 'Unable to write controller the file'."\r\n";
         }else{
@@ -66,13 +66,13 @@ pub async fn form(req: Request<PgPool>) -> tide::Result<Body> {
         //path
         $path = BASE_PATH."/src/paths.rs";
         $dataPath = "
-    app.at(\"/$folder/$table\")
+    app.at(\"/$folder/$folder2/$table\")
         .get( $table::list)
         .post($table::tambah)
         .patch($table::edit)
         .delete($table::hapus);";
         $newDataPath ="
-    app.at(\"/$folder/$table\")
+    app.at(\"/$folder/$folder2/$table\")
         .put($table::form)
         .get($table::list)
         .post($table::tambah)
@@ -90,7 +90,7 @@ pub async fn form(req: Request<PgPool>) -> tide::Result<Body> {
         $path_doc = BASE_DOC."/api-spdmlk.html";
         $docs = "
                         <li>Form<pre>
-    PUT $folder/$table
+    PUT $folder/$folder2/$table
     JSON Response Body : [{".substr($json_param, 0, -2)."}]
                         </pre></li>
         ";
