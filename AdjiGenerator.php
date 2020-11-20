@@ -23,10 +23,10 @@
     }
 
     // echo "Commands: \n
-    //     php -r \"require 'AdjiGenerator.php'; crud_module('table');\"
+    //     php -r \"require 'AdjiGenerator.php'; crud_module('table', 'foreigns');\"
     // \n";
-    function crud_module($table=""){
-        crud_single_module($table);
+    function crud_module($table="", $foreigns=""){
+        crud_single_module($table, $foreigns);
     }
 
     // echo "Commands: \n
