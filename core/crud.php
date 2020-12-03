@@ -28,9 +28,25 @@ struct ".ucfirst($table)." {
     $i = 1;
     foreach($allField as $fieldName){
         // print($fieldName['column_name'].' : '.$fieldName['data_type']);
-        $string .= $fieldName['column_name']." : "; $string .= $fieldName['data_type'] == 'integer' ? 'i32'.",
-        " : 'String'.",
+        if($fieldName['data_type'] == 'integer'){
+        $string .= $fieldName['column_name']." : i32,
         ";
+        }else if($fieldName['data_type'] == 'date'){
+        $string .= $fieldName['column_name']." : NaiveDate,
+        use chrono::{NaiveDate}
+        ";
+        }else if($fieldName['data_type'] == 'timestamp without time zone'){
+        $string .= $fieldName['column_name']." : DateTime<Utc>
+        use chrono::{DateTime, Utc}
+        ";
+        }else if($fieldName['data_type'] == 'json'){
+        $string .= $fieldName['column_name']." : Vec<String>,
+        use serde_json::Result;
+        ";
+        }else{
+        $string .= $fieldName['column_name']." : String,
+        ";
+        }
         $column_query .= $fieldName['column_name'].", ";
         $param_query .= $table.".".$fieldName['column_name'].", ";
         $value_query .= "$".$i.", ";
