@@ -7,6 +7,7 @@
     require_once 'core/form_need.php';
     require_once 'core/form_need_sub.php';
     require_once 'core/form_module.php';
+    require_once 'core/read_module_sub.php';
     
     // echo "Commands: \n
     //     php -r \"require 'AdjiGenerator.php'; crud('table','folder','foreigns');\"
@@ -62,5 +63,13 @@
     // \n";
     function form_module($table="", $foreigns=""){
         form_need_module($table, $foreigns);
+    }
+
+    // echo "Commands: \n
+    //     php -r \"require 'AdjiGenerator.php'; read_sub_module('controller','folder','tables');\"
+    // \n";
+
+    function read_sub_module($controller="", $folder="", $tables=""){
+        read_sub_tables($controller, $folder, $tables);
     }
 ?>

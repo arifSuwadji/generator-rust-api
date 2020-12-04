@@ -2,9 +2,9 @@
     require_once 'functions.php';
     
     // echo "Commands: \n
-    //     php -r \"require 'AdjiGenerator.php'; crud('controller','tables');\"
+    //     php -r \"require 'AdjiGenerator.php'; read_sub_tables('controller','folder','tables');\"
     // \n";
-    function read_tables($controller="",$tables=""){
+    function read_sub_tables($controller="", $folder="", $tables=""){
         $arrTables = explode(';', $tables);
         $string .="use tide::{Request, Response};
 use sqlx::PgPool;
@@ -66,10 +66,10 @@ pub async fn list(req: Request<PgPool>) -> tide::Result<Response> {
 }
     ";
         //controller
-        createFile($string, BASE_PATH."/src/handler/".$controller.".rs");
+        createFile($string, BASE_PATH."/src/handler/$folder/".$controller.".rs");
         
         //initilize controller
-        $mod = BASE_PATH."/src/handler/mod.rs";
+        $mod = BASE_PATH."/src/handler/$folder/mod.rs";
         $data = "pub mod $controller;\n";
         if(!write_file($mod, $data, 'a')){
             echo 'Unable to write mod the file'."\r\n";
@@ -80,7 +80,7 @@ pub async fn list(req: Request<PgPool>) -> tide::Result<Response> {
         //path
         $path = BASE_PATH."/src/paths.rs";
         $dataPath = "
-    app.at(\"/$controller\")
+    app.at(\"/$folder/$controller\")
         .get( $controller::list);\n";
         if(!write_file($path, $dataPath, 'a')){
             echo 'Unable to write paths the file'."\r\n";
@@ -94,7 +94,7 @@ pub async fn list(req: Request<PgPool>) -> tide::Result<Response> {
                 <li>".ucfirst($controller)."
                     <ol>
                         <li>List<pre>
-    GET /$controller
+    GET /$folder/$controller
         ";
         // echo("all json param;");
         // var_dump($all_json_param);
